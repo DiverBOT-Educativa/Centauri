@@ -1,10 +1,10 @@
 # Long Distance Cloud Measurement Through Stereo Vision
 ## An European Astro Pi Challenge Proyect 
 ## by Centauri's Team 
-
+![SatMedidaNuBes](Imagenes/EjemploMedidaAnguloNubes.png)
 #### What is our experiment idea?
-Clouds have been included in several studies about climate models. Cloudsí warming effect may be strongly amplified or slightly dampened based on their type and height. 
-The main objective of this experiment is to use ìstereo-visionî to calculate the height of clouds. We will catalogue the different types of clouds identified using AI.
+Clouds have been included in several studies about climate models. Clouds‚Äô warming effect may be strongly amplified or slightly dampened based on their type and height. 
+The main objective of this experiment is to use ‚Äústereo-vision‚Äù to calculate the height of clouds. We will catalogue the different types of clouds identified using AI.
 
 
 #### How will we use the Astro Pi computers to perform our experiment?
