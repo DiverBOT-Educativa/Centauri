@@ -1,46 +1,88 @@
 from tkinter import BaseWidget
 from PIL import Image
 import numpy as np
+import numba as nb
+import time
 
-img1 = np.asarray(Image.open("Imagenes/img950.jpg").resize((400, 400)))
 
+cloudThreshold = 200
+chunkSize = 40
+differenceThreshold = 0
+imageRes = 400
+
+
+img1 = np.asarray(Image.open("Imagenes/test1.png").resize((imageRes, imageRes)), dtype=np.uint8).copy() # load image, resize, convert to uint8, and copy
 
 img1 = img1[:, :, 2] # Convert to red channel only
-img1[img1<200] = 0 # Remove anything that isn't a cloud
+img1[img1<cloudThreshold] = 0 # convert to binary
+img1[img1>0] = 1
 
-img2 = np.asarray(Image.open("Imagenes/img960.jpg").resize((400, 400)))
 
+img2 = np.asarray(Image.open("Imagenes/test2.png").resize((imageRes, imageRes)), dtype=np.uint8).copy()
 
 img2 = img2[:, :, 2]
-img2[img2<200] = 0
-
-diff = 0
-
-print(img1.shape)
-
-chunkSize = 64
-
-Image.fromarray(img1).show()
-
-for x in range(0, img1.shape[0]-chunkSize, chunkSize):
-    for y in range(0, img1.shape[1]-chunkSize, chunkSize):
-        slice1 = img1[x:x+chunkSize, y:y+chunkSize]# - img2[x:x+8, y:y+8]
-        sum = np.sum(slice1)
-        if sum > 0:
-            min = 3000000000
-            coords = [0, 0]
-            for xx in range(img2.shape[0] - chunkSize):
-                for yy in range(img2.shape[1]- chunkSize):
+img2[img2<cloudThreshold] = 0
+img2[img2>0] = 1
 
 
-                    diff = np.abs(slice1 - img2[xx:xx+chunkSize, yy:yy+chunkSize])
-                    if np.sum(diff) < min:
-                        min = np.sum(diff)
-                        coords[0] = xx
-                        coords[1] = yy
+Image.fromarray(img1 * 150).show()
 
-            Image.fromarray(slice1).show()
-            Image.fromarray(img2[coords[0]:coords[0]+chunkSize, coords[1]:coords[1]+chunkSize]).show()
 
-            print(min, coords)
-        
+
+@nb.jit(nopython=True, parallel=True)
+def findImage(img1, img2, chunkSize, UsableThreshold):
+    outSizeX = np.uint8(img1.shape[0]/chunkSize) # calculate the number of chunks
+    outSizeY = np.uint8(img1.shape[1]/chunkSize)
+
+    coords = np.zeros((outSizeX, outSizeY, 2), dtype=np.uint16) # create an array to store all the coordinates of the found image
+
+    for x in nb.prange(outSizeX): # use a parralel loop
+        for y in nb.prange(outSizeY):
+            slice1 = img1[x*chunkSize:(x+1)*chunkSize, y*chunkSize:(y+1)*chunkSize] # multiply the current chunk by the chunksize to get the image slice
+
+
+
+            if np.sum(slice1) > UsableThreshold: # if there are more than 200 pixels
+                min = 10000000
+
+                for xx in range(img2.shape[0] - chunkSize): # loop over every pixel of the second image
+                    for yy in range(img2.shape[1] - chunkSize):
+                        slice2 = img2[xx:xx+chunkSize, yy:yy+chunkSize] # get a slice of the second image
+                        difference = np.sum(slice1^slice2) # calculate the sum of the xor, the lower it is, the more similar the images are
+
+                        if difference <= min:
+                            min = difference # update the minimum
+                            coords[x, y] = [xx, yy] # and store the coordinates
+
+                # print(min,"sum", np.sum(slice1), x, y, " ", coords[x][y])
+                # sample1 = img1.copy()
+                # sample1[x*chunkSize:(x+1)*chunkSize, y*chunkSize:(y+1)*chunkSize] *= 150
+                #
+                # sample2 = img2.copy()
+                # sample2[coords[x][y][0]:coords[x][y][0]+chunkSize, coords[x][y][1]:coords[x][y][1]+chunkSize] *= 150
+                # Image.fromarray(sample1).show()
+                # Image.fromarray(sample2).show()
+
+    return coords
+
+
+# first time is slower
+startTime = time.time()
+print(findImage(img1, img2, chunkSize, 100))
+print("took", time.time() - startTime, "seconds")
+
+startTime = time.time()
+coords = findImage(img1, img2, chunkSize, 100)
+print("took", time.time() - startTime, "seconds")
+
+# show results
+for x in range(coords.shape[0]):
+    for y in range(coords.shape[1]):
+        if not (coords[x][y][0] == 0):
+            sample1 = img1.copy()
+            sample1[x*chunkSize:(x+1)*chunkSize, y*chunkSize:(y+1)*chunkSize] *= 150
+
+            sample2 = img2.copy()
+            sample2[coords[x][y][0]:coords[x][y][0]+chunkSize, coords[x][y][1]:coords[x][y][1]+chunkSize] *= 150
+            Image.fromarray(sample1).show()
+            Image.fromarray(sample2).show()
