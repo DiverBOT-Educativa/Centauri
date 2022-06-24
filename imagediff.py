@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from ImgProcessing import *
 import random
 
-cloudThreshold = 200 # brightness at which clouds are included
+cloudThreshold = 190 # brightness at which clouds are included
 imageRes = 600 # resolution of the downscaled image
 
 
@@ -15,7 +15,7 @@ chunkSize = 20 # size of the chunks. higher = less resolution, more accuracy. lo
 minCloudPercentage = 0.1 # used to determine if a chunk is suitable to check
 maxCloudPercentage = 0.95
 
-distanceThreshold = 40 # max distance between two points that is acceptable
+distanceThreshold = 50 # max distance between two points that is acceptable
 
 
 

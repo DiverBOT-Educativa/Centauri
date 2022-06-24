@@ -59,7 +59,7 @@ def calculateDistance(coords, chunkSize, distanceThreshold):
         for y in range(coords.shape[1]):
             if not (coords[x][y][0] == 0 and coords[x][y][1] == 0) : # if the coordinates are at 0, 0, dont include
                 if (coords[x][y][0] == 65535 and coords[x][y][1] == 65535):
-                    distances[x, y] = np.max(np.asarray([distances[x-1, y], distances[x+1, y], distances[x, y-1], distances[x, y+1]]))
+                    distances[x, y] = np.max(np.asarray([distances[x-1, y], distances[x+1, y], distances[x, y-1], distances[x, y+1]])) * 0.95
 
                 else:
                     distance = np.sqrt(np.power(coords[x][y][0] - x*chunkSize, 2) + np.power(coords[x][y][1] - y*chunkSize, 2)) # calculate how many pixels away
