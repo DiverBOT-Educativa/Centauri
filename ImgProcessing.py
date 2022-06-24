@@ -71,7 +71,7 @@ def calculateDistance(coords, chunkSize, distanceThreshold):
     return distances
 
 # visualize the output
-def visualizeData(distances, img, distanceThreshold):
+def visualizeData(distances, img, distanceThreshold, imgIndex):
     processedDistances = Image.fromarray(distances / distanceThreshold * 255).resize((img.shape[0], img.shape[1])) # convert to image and resize
     processedDistances = processedDistances.convert('L').filter( ImageFilter.GaussianBlur(radius=25) ) # convert to L datatype and blur
 
@@ -80,4 +80,5 @@ def visualizeData(distances, img, distanceThreshold):
     processedDistances[img==0] = 0 # mask using the original image
 
     plt.imshow(processedDistances, cmap='gnuplot2') # cmap is the colors used
+    plt.title("Altitude map for image " + str(imgIndex), fontsize="large")
     plt.show()

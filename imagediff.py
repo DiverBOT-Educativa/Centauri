@@ -22,7 +22,7 @@ distanceThreshold = 50 # max distance between two points that is acceptable
 while True:
     absoluteStartTime = time.time()
     print("loading and processing images...")
-    randomImg = random.randrange(0, 100) # select a random image
+    randomImg = random.randrange(0, 1882) # select a random image
     print("image index:", randomImg)
     img1 = loadAndProcessImage("img/img" + str(randomImg) + ".jpg", cloudThreshold, imageRes) # load and process both images
     img2 = loadAndProcessImage("img/img" + str(randomImg + 1) + ".jpg", cloudThreshold, imageRes)
@@ -50,4 +50,4 @@ while True:
     print("total loop time: " + str(time.time() - absoluteStartTime) + " seconds")
     print("----------------------------------------------------------------")
     print()
-    visualizeData(distances, img1, distanceThreshold) # visualize
+    visualizeData(distances, img1, distanceThreshold, randomImg) # visualize
