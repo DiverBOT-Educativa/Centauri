@@ -1,5 +1,5 @@
 # Long Distance Cloud Measurement Through Stereo Vision
-## An European Astro Pi Challenge Proyect
+## An European Astro Pi Challenge Project
 ## by Centauri's Team
 ![SatMedidaNuBes](AltitudeEstimationExample.png)
 #### What is our experiment idea?
